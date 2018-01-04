@@ -1,0 +1,8 @@
+[package]
+name = "rust-synth"
+version = "0.1.0"
+authors = ["Donovan Preston <donovanpreston@gmail.com>"]
+
+[dependencies]
+sdl2 = "0.31.0"
+
