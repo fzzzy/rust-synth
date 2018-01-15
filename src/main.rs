@@ -1,28 +1,25 @@
-// This is the example code from rust-sdl2/src/sdl2/audio.rs
+// This is the example code modified from rust-sdl2/src/sdl2/audio.rs
+// It now generates a sine wave instead of a square wave
 
 extern crate sdl2;
 
 use sdl2::audio::{AudioCallback, AudioSpecDesired};
 use std::time::Duration;
+use std::f32::consts::PI;
 
-struct SquareWave {
+struct SineWave {
     phase_inc: f32,
     phase: f32,
-    volume: f32
 }
 
-impl AudioCallback for SquareWave {
+impl AudioCallback for SineWave {
     type Channel = f32;
 
     fn callback(&mut self, out: &mut [f32]) {
-        // Generate a square wave
+        // Generate a sin wave
         for x in out.iter_mut() {
-            *x = if self.phase <= 0.5 {
-                self.volume
-            } else {
-                -self.volume
-            };
-            self.phase = (self.phase + self.phase_inc) % 1.0;
+            *x = f32::sin(self.phase);
+            self.phase = self.phase + self.phase_inc;
         }
     }
 }
@@ -39,16 +36,15 @@ fn main() {
 
     let device = audio_subsystem.open_playback(None, &desired_spec, |spec| {
         // initialize the audio callback
-        SquareWave {
-            phase_inc: 440.0 / spec.freq as f32,
+        SineWave {
+            phase_inc: (PI * 2.0 * 440.0) / spec.freq as f32,
             phase: 0.0,
-            volume: 0.25
         }
     }).unwrap();
 
     // Start playback
     device.resume();
 
-    // Play for 2 seconds
-    std::thread::sleep(Duration::from_millis(2000));
+    // Play for 1 second
+    std::thread::sleep(Duration::from_millis(1000));
 }
